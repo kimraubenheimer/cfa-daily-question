@@ -29,8 +29,8 @@ jobs:
       - name: Generate daily question and send email
         run: python app/generate_question.py
         env:
-          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_ADDRESS: ${{ secrets.GMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
 
       - name: Commit new question page
