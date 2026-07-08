@@ -172,9 +172,12 @@ def create_html(question_text, options, correct_option, answer_text):
 """
 
     # os.makedirs("questions", exist_ok=True)
-    os.makedirs("../questions", exist_ok=True)
+    # os.makedirs("../questions", exist_ok=True)
 
-    filename = f"questions/{today}.html"
+    # filename = f"questions/{today}.html"
+    os.makedirs("app/questions", exist_ok=True)
+
+    filename = f"app/questions/{today}.html"
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(page)
