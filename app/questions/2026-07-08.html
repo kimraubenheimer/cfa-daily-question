@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CFA Question 2026-07-08</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            padding-top: 80px;
+        }
+
+        .box {
+            background: white;
+            padding: 30px;
+            width: 520px;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            margin: 12px 0;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: #e8e8e8;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background: #d6d6d6;
+        }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h1>Question of the Day</h1>
+    <h2>Company specific issues for choosing a forecasting horizon include:</h2>
+
+    <button onclick="checkAnswer('a')">A. industry cyclicality.</button>
+    <button onclick="checkAnswer('b')">B. recent restructuring.</button>
+    <button onclick="checkAnswer('c')">C. manager preferences.</button>
+</div>
+
+<script>
+    function checkAnswer(choice) {
+        const correctOption = "b";
+        const answerText = "Correct Answer: B\rUnusual or recent restructuring, strategic initiatives, and accounting charges can create unrealistic expectations of potential growth, and are specific to companies.";
+
+        if (choice === correctOption) {
+            alert("Correct!\n\n" + answerText);
+        } else {
+            alert("Incorrect.\n\n" + answerText);
+        }
+    }
+</script>
+
+</body>
+</html>
