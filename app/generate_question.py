@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 
 
 URL = "https://www.kaplanquizzes.com/cfa-level-2/"
-SITE_URL = "https://kimraubenheimer.github.io/cfa-daily-question"
+SITE_URL = "https://kimraubenheimer.github.io/cfa-daily-question/app"
 
 
 def scrape_kaplan():
@@ -171,7 +171,8 @@ def create_html(question_text, options, correct_option, answer_text):
 </html>
 """
 
-    os.makedirs("questions", exist_ok=True)
+    # os.makedirs("questions", exist_ok=True)
+    os.makedirs("../questions", exist_ok=True)
 
     filename = f"questions/{today}.html"
 
@@ -211,7 +212,7 @@ Click an answer to reveal the explanation.
 def main():
     question_text, options, correct_option, answer_text = scrape_kaplan()
     today, filename = create_html(question_text, options, correct_option, answer_text)
-    # send_email(today)
+    send_email(today)
 
     print(f"Created {filename}")
     print("Email sent")

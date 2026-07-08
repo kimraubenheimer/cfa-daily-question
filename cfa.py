@@ -4,8 +4,8 @@ import smtplib
 from email.message import EmailMessage
 import os
 
-EMAIL = os.environ["GMAIL_USER"]
-PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
+# EMAIL = os.environ["GMAIL_USER"]
+# PASSWORD = os.environ["GMAIL_APP_PASSWORD"]
 URL = "https://www.kaplanquizzes.com/cfa-level-2/"
 
 def get_question(text):
@@ -14,13 +14,13 @@ def get_question(text):
     # text = soup.get_text("\n", strip=True)
 
     # Simple extraction based on current page structure
-    start = text.find("CFA Level II Practice Question")
+    start = text.find("Answers Today")
     end = text.find("CORRECT")
 
     if start == -1 or end == -1:
         raise ValueError("Could not find question block")
 
-    print("Extracted question text:", text[start:end].strip())
+    print("Question: ", text[start + 13:end].strip())
     return text[start:end].strip()
 
 def get_answer(text):
@@ -63,5 +63,5 @@ if __name__ == "__main__":
     question = get_question(text)
     answer = get_answer(text)
 
-    send_email(question, "question")
-    send_email(answer, "answer")
+    # send_email(question, "question")
+    # send_email(answer, "answer")
