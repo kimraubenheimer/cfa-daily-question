@@ -535,7 +535,7 @@ Click an answer to reveal the explanation.
 def main():
     question_text, options, correct_option, answer_text = scrape_kaplan()
     today, filename = create_html(question_text, options, correct_option, answer_text)
-    # send_email(today)
+    send_email(today)
 
     # print(f"Created {filename}")
     # print("Email sent")
