@@ -16,76 +16,134 @@ URL = "https://www.kaplanquizzes.com/cfa-level-2/"
 SITE_URL = "https://kimraubenheimer.github.io/cfa-daily-question/app"
 
 
+# def scrape_kaplan():
+#     page = requests.get(URL, timeout=20)
+#     page.raise_for_status()
+
+#     soup = BeautifulSoup(page.text, "html.parser")
+
+#     form = soup.find("form", id="answer_form")
+
+#     if form is None:
+#         raise ValueError("Could not find answer form")
+
+#     # Get the options
+#     options = []
+
+#     for radio in form.find_all("input", {"name": "optionsRadios"}):
+#         label = radio.find_parent("label")
+#         option_text = label.get_text(" ", strip=True)
+#         options.append(option_text)
+
+#     if len(options) != 3:
+#         raise ValueError(f"Expected 3 options, found {len(options)}")
+
+#     # Get the question
+#     question_area = soup.find("div", id="questionspot")
+
+#     if question_area is None:
+#         raise ValueError("Could not find question area")
+
+#     full_text = question_area.get_text("\n", strip=True)
+
+#     first_option = options[0]
+#     start = full_text.find("Answers Today")
+#     end = full_text.find(first_option)
+
+#     if start == -1 or end == -1:
+#         raise ValueError("Could not extract question text")
+
+#     question_text = full_text[start:end]
+#     question_text = question_text.replace("Answers Today", "").strip()
+
+#     # Remove title line if present
+#     lines = [line.strip() for line in question_text.split("\n") if line.strip()]
+
+#     if lines and lines[0].startswith("CFA Level II Practice Question"):
+#         lines = lines[1:]
+
+#     question_text = " ".join(lines).strip()
+
+#     # Get the hidden answer block
+#     answer_container = soup.find("div", id="answer")
+
+#     if answer_container is None:
+#         raise ValueError("Could not find answer container")
+
+#     answer_div = answer_container.find("div", style=lambda s: s and "padding:30px" in s)
+
+#     if answer_div is None:
+#         raise ValueError("Could not find answer text div")
+
+#     answer_text = answer_div.get_text(" ", strip=True)
+#     # Clean out CORRECT / INCORRECT labels
+#     answer_text = answer_text.replace("CORRECT", "").replace("INCORRECT", "").strip()
+
+#     # Get correct answer letter
+#     match = re.search(r"Correct Answer:\s*([abcABC])", answer_text, re.I)
+
+#     if not match:
+#         raise ValueError("Could not find correct answer letter")
+
+#     correct_option = match.group(1).lower()
+
+#     return question_text, options, correct_option, answer_text
+
 def scrape_kaplan():
     page = requests.get(URL, timeout=20)
     page.raise_for_status()
 
     soup = BeautifulSoup(page.text, "html.parser")
 
+    # Options
     form = soup.find("form", id="answer_form")
-
     if form is None:
         raise ValueError("Could not find answer form")
 
-    # Get the options
-    options = []
-
-    for radio in form.find_all("input", {"name": "optionsRadios"}):
-        label = radio.find_parent("label")
-        option_text = label.get_text(" ", strip=True)
-        options.append(option_text)
+    options = [
+        label.get_text(" ", strip=True)
+        for label in form.find_all("label")
+    ]
 
     if len(options) != 3:
         raise ValueError(f"Expected 3 options, found {len(options)}")
 
-    # Get the question
-    question_area = soup.find("div", id="questionspot")
-
+    # Question
+    question_area = soup.find("div", class_="container insidecontainer")
     if question_area is None:
-        raise ValueError("Could not find question area")
+        raise ValueError("Could not find question container")
 
     full_text = question_area.get_text("\n", strip=True)
 
-    first_option = options[0]
     start = full_text.find("Answers Today")
-    end = full_text.find(first_option)
+    end = full_text.find(options[0])
 
     if start == -1 or end == -1:
         raise ValueError("Could not extract question text")
 
-    question_text = full_text[start:end]
-    question_text = question_text.replace("Answers Today", "").strip()
+    question_text = full_text[start + len("Answers Today"):end].strip()
+    question_text = " ".join(question_text.split())
 
-    # Remove title line if present
-    lines = [line.strip() for line in question_text.split("\n") if line.strip()]
+    # Answer explanation
+    answer_box = soup.find("div", id="answer")
+    if answer_box is None:
+        raise ValueError("Could not find answer box")
 
-    if lines and lines[0].startswith("CFA Level II Practice Question"):
-        lines = lines[1:]
+    answer_p = answer_box.find("p")
+    if answer_p is None:
+        raise ValueError("Could not find answer paragraph")
 
-    question_text = " ".join(lines).strip()
+    answer_text = answer_p.get_text(" ", strip=True)
 
-    # Get the hidden answer block
-    answer_container = soup.find("div", id="answer")
+    # Correct option, e.g. Choice "c" is correct.
+    parts = answer_text.split('"')
+    if len(parts) < 2:
+        raise ValueError(f"Could not extract correct answer from: {answer_text}")
 
-    if answer_container is None:
-        raise ValueError("Could not find answer container")
+    correct_option = parts[1].lower()
 
-    answer_div = answer_container.find("div", style=lambda s: s and "padding:30px" in s)
-
-    if answer_div is None:
-        raise ValueError("Could not find answer text div")
-
-    answer_text = answer_div.get_text(" ", strip=True)
-    # Clean out CORRECT / INCORRECT labels
-    answer_text = answer_text.replace("CORRECT", "").replace("INCORRECT", "").strip()
-
-    # Get correct answer letter
-    match = re.search(r"Correct Answer:\s*([ABC])", answer_text, re.I)
-
-    if not match:
-        raise ValueError("Could not find correct answer letter")
-
-    correct_option = match.group(1).lower()
+    if correct_option not in ["a", "b", "c"]:
+        raise ValueError(f"Invalid correct option: {correct_option}")
 
     return question_text, options, correct_option, answer_text
 
@@ -477,7 +535,7 @@ Click an answer to reveal the explanation.
 def main():
     question_text, options, correct_option, answer_text = scrape_kaplan()
     today, filename = create_html(question_text, options, correct_option, answer_text)
-    send_email(today)
+    # send_email(today)
 
     # print(f"Created {filename}")
     # print("Email sent")
